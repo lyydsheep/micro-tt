@@ -94,6 +94,9 @@ func prodHandler() slog.Handler {
 
 func addParams(ctx context.Context, args ...any) []any {
 	// 添加 trace_id
+	if ctx == nil {
+		ctx = context.Background()
+	}
 	if traceID := ctx.Value("trace_id"); traceID != nil {
 		args = append(args, "trace_id", traceID)
 	}
