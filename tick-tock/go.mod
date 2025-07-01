@@ -21,9 +21,11 @@ require (
 	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/go-playground/form/v4 v4.2.1 // indirect
 	github.com/google/uuid v1.6.0 // indirect
+	github.com/gorhill/cronexpr v0.0.0-20180427100037-88b0669f7d75 // indirect
 	github.com/gorilla/mux v1.8.1 // indirect
 	github.com/kr/text v0.2.0 // indirect
 	github.com/panjf2000/ants/v2 v2.11.3 // indirect
+	github.com/robfig/cron/v3 v3.0.0 // indirect
 	go.opentelemetry.io/otel v1.24.0 // indirect
 	go.opentelemetry.io/otel/metric v1.24.0 // indirect
 	go.opentelemetry.io/otel/trace v1.24.0 // indirect
