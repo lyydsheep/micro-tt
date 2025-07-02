@@ -27,8 +27,13 @@ message Server {
 
 message Data {
   message Database {
-    string driver = 1;
-    string source = 2;
+    string addr = 1;
+    string username = 2;
+    string password = 3;
+    string database = 4;
+    int32 max_open_conn = 5;
+    int32 max_idle_conn = 6;
+    google.protobuf.Duration conn_max_idle_time = 7;
   }
   message Redis {
     string network = 1;
@@ -38,4 +43,20 @@ message Data {
   }
   Database database = 1;
   Redis redis = 2;
+  Scheduler scheduler = 3;
+}
+
+message Scheduler {
+  // 轮询时间
+  google.protobuf.Duration poll_interval = 1;
+  // 上锁时间
+  google.protobuf.Duration lock_duration = 2;
+  // 任务成功后延续长锁时间
+  google.protobuf.Duration renew_lock_duration = 3;
+  // 协程池大小
+  int32 worker_pool_size = 4;
+  // 分片数量
+  int32 bucket_count = 5;
+  // 锁前缀
+  string lock_prefix = 6;
 }

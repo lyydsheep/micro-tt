@@ -1,15 +1,21 @@
 server:
   http:
-    addr: 0.0.0.0:8000
+    addr: 0.0.0.0:33973
     timeout: 1s
   grpc:
-    addr: 0.0.0.0:9000
+    addr: 0.0.0.0:30771
     timeout: 1s
 data:
   database:
     driver: mysql
-    source: root:root@tcp(127.0.0.1:3306)/test?parseTime=True&loc=Local
+    source: root:root@tcp(127.0.0.1:33019)/test?parseTime=True&loc=Local
   redis:
-    addr: 127.0.0.1:6379
+    addr: 127.0.0.1:34701
     read_timeout: 0.2s
     write_timeout: 0.2s
+  scheduler:
+    poll_interval: 1s
+    lock_duration: 70s
+    lock_prefix: scheduler_lock_
+    worker_poll_size: 100
+    bucket_count: 10
