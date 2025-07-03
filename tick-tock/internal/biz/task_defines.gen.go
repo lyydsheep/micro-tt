@@ -5,6 +5,7 @@
 package biz
 
 import (
+	"context"
 	"time"
 )
 
@@ -26,4 +27,10 @@ type TaskDefine struct {
 // TableName TaskDefine's table name
 func (*TaskDefine) TableName() string {
 	return TableNameTaskDefine
+}
+
+type TaskDefineRepo interface {
+	Create(ctx context.Context, taskDefine *TaskDefine) (*TaskDefine, error)
+	Update(ctx context.Context, taskDefine *TaskDefine) (*TaskDefine, error)
+	GetTaskDefineByID(ctx context.Context, id int64) (*TaskDefine, error)
 }
