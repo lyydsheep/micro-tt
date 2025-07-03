@@ -1,9 +1,9 @@
 package data
 
 import (
-	"tick-tock/internal/conf"
+	"tick-tock/internal/data/gen"
+	"tick-tock/pkg/log"
 
-	"github.com/go-kratos/kratos/v2/log"
 	"github.com/google/wire"
 )
 
@@ -12,13 +12,13 @@ var ProviderSet = wire.NewSet(NewData, NewGreeterRepo)
 
 // Data .
 type Data struct {
-	// TODO wrapped database client
+	query *gen.Query
 }
 
 // NewData .
-func NewData(c *conf.Data, logger log.Logger) (*Data, func(), error) {
+func NewData(query *gen.Query) (*Data, func(), error) {
 	cleanup := func() {
-		log.NewHelper(logger).Info("closing the data resources")
+		log.Info(nil, "closing the data resources.")
 	}
 	return &Data{}, cleanup, nil
 }

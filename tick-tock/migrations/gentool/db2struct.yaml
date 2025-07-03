@@ -1,0 +1,21 @@
+version: "0.1"
+database:
+  dsn: "root:root@tcp(127.0.0.1:33060)/micro_tt?charset=utf8mb4&parseTime=true&loc=UTC"
+  db: "mysql"
+  tables:
+    - "task"
+    - "task_defines"
+  # specify a directory for output
+  outPath: "../../internal/data/gen"
+  # query code file name, default: gen.go
+  outFile: ""
+  # generate unit test for query code
+  withUnitTest: false
+  # generated model code's package name
+  modelPkgName: "model"
+  # generate with pointer when field is nullable
+  fieldNullable: false
+  # generate field with gorm index tag
+  fieldWithIndexTag: false
+  # generate field with gorm column type tag
+  fieldWithTypeTag: true
