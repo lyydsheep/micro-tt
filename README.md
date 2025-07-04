@@ -48,3 +48,15 @@ primary key,
     update_time timestamp   default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP
 );
 ```
+
+## Migrator
+![img.png](images/img.png)
+- 将批量任务存入 Redis 时可以使用 pipeline 技术，减少频繁的网络传输带来的开销
+- MySQL 中的数据用于兜底
+  - 在查询 MySQL 时，需要过滤掉 bucket 之外的数据
+
+## Scheduler
+![img.png](images/img02.png)
+
+## Executor
+![img.png](images/img03.png)
