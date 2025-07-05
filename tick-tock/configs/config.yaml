@@ -5,6 +5,13 @@ server:
   grpc:
     addr: 0.0.0.0:30771
     timeout: 1s
+  tasks:
+    - name: migrator
+      type: cron
+      schedule: "@every 1s"
+    - name: scheduler
+      type: once
+      schedule: "0s"
 data:
   database:
     driver: mysql

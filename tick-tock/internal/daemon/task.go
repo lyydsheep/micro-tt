@@ -2,7 +2,7 @@ package daemon
 
 import (
 	"context"
-	"github.com/gorhill/cronexpr"
+	"github.com/robfig/cron/v3"
 	"tick-tock/pkg/log"
 	"time"
 )
@@ -53,14 +53,16 @@ func (t *Task) cron(ctx context.Context) {
 	// 周期性执行
 	log.Info(ctx, "task run", "taskName", t.Name, "taskType", t.Type, "taskSchedule", t.Schedule)
 	go func() {
-		expr, err := cronexpr.Parse(t.Schedule)
+		// 使用 robfig/cron 库，支持多种时间格式
+		cron.New()
+		schedule, err := cron.ParseStandard(t.Schedule)
 		if err != nil {
 			log.Fatal(ctx, "parse cron expression error.", "error", err, "taskName", t.Name)
 		}
 		// 立即执行一次，然后等待下一个周期
 		t.Handle(ctx)
 		for {
-			wait := expr.Next(time.Now()).Sub(time.Now())
+			wait := schedule.Next(time.Now()).Sub(time.Now())
 			if err = t.run(ctx, wait); err != nil {
 				log.Error(ctx, "task run error.", "error", err, "taskName", t.Name)
 				return

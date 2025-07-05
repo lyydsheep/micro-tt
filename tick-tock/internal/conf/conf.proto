@@ -21,8 +21,20 @@ message Server {
     string addr = 2;
     google.protobuf.Duration timeout = 3;
   }
+  message TASK {
+    repeated task tasks = 1;
+  }
   HTTP http = 1;
   GRPC grpc = 2;
+  TASK task = 3;
+}
+
+message task {
+  string name = 1;
+  string type = 2;
+  // once --->  duration format, eg: 1s, 23m, 3.5h
+  // cron ---> 支持 cron表达式、@every 1s（固定时间间隔）
+  string schedule = 3;
 }
 
 message Data {
