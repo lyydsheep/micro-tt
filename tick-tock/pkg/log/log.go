@@ -3,6 +3,7 @@ package log
 import (
 	"context"
 	"fmt"
+	"github.com/lmittmann/tint"
 	"gopkg.in/natefinch/lumberjack.v2"
 	"io"
 	"log/slog"
@@ -58,8 +59,9 @@ func (h *DynamicHandler) SetLevel(level slog.Level) {
 
 func devHandler() slog.Handler {
 	appWriter := os.Stdout
-	return slog.NewTextHandler(appWriter, &slog.HandlerOptions{
-		Level: slog.LevelDebug,
+	return tint.NewHandler(appWriter, &tint.Options{
+		Level:      slog.LevelDebug,
+		TimeFormat: "2006-01-02 15:04:05",
 	})
 }
 
