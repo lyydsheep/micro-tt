@@ -34,6 +34,7 @@ require (
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.26.3 // indirect
 	github.com/jinzhu/inflection v1.0.0 // indirect
 	github.com/jinzhu/now v1.1.5 // indirect
+	github.com/lmittmann/tint v1.1.2 // indirect
 	github.com/robfig/cron/v3 v3.0.0 // indirect
 	go.etcd.io/etcd/api/v3 v3.6.1 // indirect
 	go.etcd.io/etcd/client/pkg/v3 v3.6.1 // indirect
