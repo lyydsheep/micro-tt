@@ -11,13 +11,13 @@ type taskRepo struct {
 }
 
 func (repo *taskRepo) Create(ctx context.Context, task *biz.Task) (*biz.Task, error) {
-	q := repo.data.query.Task
+	q := repo.data.DB(ctx).Task
 	err := q.WithContext(ctx).Create(task)
 	return task, err
 }
 
 func (repo *taskRepo) Update(ctx context.Context, task *biz.Task) (*biz.Task, error) {
-	q := repo.data.query.Task
+	q := repo.data.DB(ctx).Task
 	err := q.WithContext(ctx).Save(task)
 	return task, err
 }
