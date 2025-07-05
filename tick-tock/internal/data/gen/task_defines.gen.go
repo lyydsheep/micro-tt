@@ -33,6 +33,7 @@ func newTaskDefine(db *gorm.DB, opts ...gen.DOOption) taskDefine {
 	_taskDefine.Status = field.NewInt32(tableName, "status")
 	_taskDefine.Cron = field.NewString(tableName, "cron")
 	_taskDefine.NotifyHTTPParam = field.NewString(tableName, "notify_http_param")
+	_taskDefine.LastMigrateTime = field.NewTime(tableName, "last_migrate_time")
 	_taskDefine.CreateTime = field.NewTime(tableName, "create_time")
 	_taskDefine.UpdateTime = field.NewTime(tableName, "update_time")
 
@@ -53,6 +54,7 @@ type taskDefine struct {
 	Status          field.Int32  // 状态：1-active, 2-inactive
 	Cron            field.String // Cron表达式（标准5/6字段）
 	NotifyHTTPParam field.String // 回调参数（JSON格式，如{"url":"","method":"POST","headers":{}}）
+	LastMigrateTime field.Time
 	CreateTime      field.Time
 	UpdateTime      field.Time
 
@@ -78,6 +80,7 @@ func (t *taskDefine) updateTableName(table string) *taskDefine {
 	t.Status = field.NewInt32(table, "status")
 	t.Cron = field.NewString(table, "cron")
 	t.NotifyHTTPParam = field.NewString(table, "notify_http_param")
+	t.LastMigrateTime = field.NewTime(table, "last_migrate_time")
 	t.CreateTime = field.NewTime(table, "create_time")
 	t.UpdateTime = field.NewTime(table, "update_time")
 
@@ -106,7 +109,7 @@ func (t *taskDefine) GetFieldByName(fieldName string) (field.OrderExpr, bool) {
 }
 
 func (t *taskDefine) fillFieldMap() {
-	t.fieldMap = make(map[string]field.Expr, 9)
+	t.fieldMap = make(map[string]field.Expr, 10)
 	t.fieldMap["id"] = t.ID
 	t.fieldMap["tid"] = t.Tid
 	t.fieldMap["app"] = t.App
@@ -114,6 +117,7 @@ func (t *taskDefine) fillFieldMap() {
 	t.fieldMap["status"] = t.Status
 	t.fieldMap["cron"] = t.Cron
 	t.fieldMap["notify_http_param"] = t.NotifyHTTPParam
+	t.fieldMap["last_migrate_time"] = t.LastMigrateTime
 	t.fieldMap["create_time"] = t.CreateTime
 	t.fieldMap["update_time"] = t.UpdateTime
 }

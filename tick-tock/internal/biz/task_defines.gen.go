@@ -6,6 +6,7 @@ package biz
 
 import (
 	"context"
+	"tick-tock/internal/constant"
 	"time"
 )
 
@@ -20,6 +21,7 @@ type TaskDefine struct {
 	Status          int32     `gorm:"column:status;type:tinyint;not null;default:1;comment:状态：1-active, 2-inactive" json:"status"`                               // 状态：1-active, 2-inactive
 	Cron            string    `gorm:"column:cron;type:varchar(64);not null;comment:Cron表达式（标准5/6字段）" json:"cron"`                                                // Cron表达式（标准5/6字段）
 	NotifyHTTPParam string    `gorm:"column:notify_http_param;type:json;comment:回调参数（JSON格式，如{"url":"","method":"POST","headers":{}}）" json:"notify_http_param"` // 回调参数（JSON格式，如{"url":"","method":"POST","headers":{}}）
+	LastMigrateTime time.Time `gorm:"column:last_migrate_time;type:timestamp;not null;default:CURRENT_TIMESTAMP" json:"last_migrate_time"`
 	CreateTime      time.Time `gorm:"column:create_time;type:timestamp;not null;default:CURRENT_TIMESTAMP" json:"create_time"`
 	UpdateTime      time.Time `gorm:"column:update_time;type:timestamp;not null;default:CURRENT_TIMESTAMP" json:"update_time"`
 }
@@ -33,4 +35,5 @@ type TaskDefineRepo interface {
 	Create(ctx context.Context, taskDefine *TaskDefine) (*TaskDefine, error)
 	Update(ctx context.Context, taskDefine *TaskDefine) (*TaskDefine, error)
 	GetTaskDefineByID(ctx context.Context, id int64) (*TaskDefine, error)
+	GetTaskDefineByStatus(ctx context.Context, status constant.TaskDefineStatus) ([]*TaskDefine, error)
 }

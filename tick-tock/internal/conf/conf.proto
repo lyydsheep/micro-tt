@@ -56,6 +56,7 @@ message Data {
   Database database = 1;
   Redis redis = 2;
   Scheduler scheduler = 3;
+  Migrator migrator = 4;
 }
 
 message Scheduler {
@@ -71,4 +72,8 @@ message Scheduler {
   int32 bucket_count = 5;
   // 锁前缀
   string lock_prefix = 6;
+}
+
+message Migrator {
+  google.protobuf.Duration migrate_step = 1;
 }
