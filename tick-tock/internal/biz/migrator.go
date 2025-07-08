@@ -27,6 +27,7 @@ func NewMigrator(data *conf.Data, taskDefineRepo TaskDefineRepo, taskRepo TaskRe
 	}
 }
 
+// Start 启动一次数据迁移
 func (m *MigratorUseCase) Start(ctx context.Context) {
 	log.Info(ctx, "migrator start.")
 	// 获取所有 有效的 任务定义
@@ -38,6 +39,7 @@ func (m *MigratorUseCase) Start(ctx context.Context) {
 	var eg errgroup.Group
 	for _, taskDefine := range taskDefines {
 		eg.Go(func() error {
+			// 迁移一个步长的数据
 			return m.migrator(ctx, taskDefine, m.data.Migrator.MigrateStep.AsDuration())
 		})
 	}
@@ -56,11 +58,14 @@ func (m *MigratorUseCase) migrator(ctx context.Context, taskDefine *TaskDefine, 
 
 	// 生成一个步长内的定时任务
 	start, now := taskDefine.LastMigrateTime, time.Now().UTC()
+	// 如果开始时间早于当前时间，则从当前时间开始
+	// 避免出现[start, now]之间的任务
 	if start.Before(now) {
 		log.Info(ctx, "start time is before now.", "task_define_id", taskDefine.ID)
 		start = now
 	}
 	end := start.Add(step)
+	// 生成[start, end)时间范围内的任务
 	tasks, err := m.generateTask(ctx, taskDefine, start, end)
 	if err != nil {
 		log.Error(ctx, "generate task error.", "error", err, "task_define_id", taskDefine.ID)
@@ -70,6 +75,7 @@ func (m *MigratorUseCase) migrator(ctx context.Context, taskDefine *TaskDefine, 
 
 	// 将定时任务插入数据库
 	taskDefine.LastMigrateTime = end
+	// 执行事务：1. 保存任务 2. 更新 任务定义 的生成任务起始时间
 	if err = m.txnManager.Txn(ctx, func(ctx context.Context) error {
 		return m.saveTasksAndUpdateTaskDefine(ctx, taskDefine, tasks)
 	}); err != nil {
