@@ -75,7 +75,7 @@ func (m *MigratorUseCase) migrator(ctx context.Context, taskDefine *TaskDefine, 
 
 	// 将定时任务插入数据库
 	taskDefine.LastMigrateTime = end
-	// 执行事务：1. 保存任务 2. 更新 任务定义 的生成任务起始时间
+	// 执行事务：1. 保存任务 2. 更新 任务定义的生成任务起始时间
 	if err = m.txnManager.Txn(ctx, func(ctx context.Context) error {
 		return m.saveTasksAndUpdateTaskDefine(ctx, taskDefine, tasks)
 	}); err != nil {
@@ -91,16 +91,16 @@ func (m *MigratorUseCase) migrator(ctx context.Context, taskDefine *TaskDefine, 
 	return nil
 }
 
-func (m *MigratorUseCase) generateTask(ctx context.Context, taskDefine *TaskDefine, start, end time.Time) ([]Task, error) {
+func (m *MigratorUseCase) generateTask(ctx context.Context, taskDefine *TaskDefine, start, end time.Time) ([]*Task, error) {
 	schedule, err := cron.ParseStandard(taskDefine.Cron)
 	if err != nil {
 		log.Error(ctx, "parse cron error.", "error", err, "cron", taskDefine.Cron, "task_define_id", taskDefine.ID)
 		return nil, err
 	}
 	// 时间范围 [start, end)
-	tasks := make([]Task, 0)
+	tasks := make([]*Task, 0)
 	for next := schedule.Next(start); next.Before(end); next = schedule.Next(next) {
-		tasks = append(tasks, Task{
+		tasks = append(tasks, &Task{
 			App:        taskDefine.App,
 			Tid:        taskDefine.Tid,
 			Status:     constant.TaskInit.ToInt32(),
@@ -112,13 +112,13 @@ func (m *MigratorUseCase) generateTask(ctx context.Context, taskDefine *TaskDefi
 	return tasks, nil
 }
 
-func (m *MigratorUseCase) saveTasksAndUpdateTaskDefine(ctx context.Context, taskDefine *TaskDefine, tasks []Task) error {
+func (m *MigratorUseCase) saveTasksAndUpdateTaskDefine(ctx context.Context, taskDefine *TaskDefine, tasks []*Task) error {
 	if _, err := m.taskDefineRepo.Update(ctx, taskDefine); err != nil {
 		log.Error(ctx, "update task define error.", "error", err, "task_define_id", taskDefine.ID)
 		return err
 	}
 	for _, task := range tasks {
-		if _, err := m.taskRepo.Create(ctx, &task); err != nil {
+		if _, err := m.taskRepo.Create(ctx, task); err != nil {
 			log.Error(ctx, "create task error.", "error", err, "task_define_id", taskDefine.ID)
 			return err
 		}
@@ -126,6 +126,6 @@ func (m *MigratorUseCase) saveTasksAndUpdateTaskDefine(ctx context.Context, task
 	return nil
 }
 
-func (m *MigratorUseCase) saveTasks(ctx context.Context, tasks []Task) error {
+func (m *MigratorUseCase) saveTasks(ctx context.Context, tasks []*Task) error {
 	return m.taskCache.SaveTasks(ctx, tasks)
 }
