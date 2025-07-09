@@ -1,0 +1,66 @@
+syntax = "proto3";
+
+package helloworld.v1;
+
+import "google/api/annotations.proto";
+
+option go_package = "tick-tock/api/tick_tock/v1;v1";
+
+service TickTocker {
+
+  // Create task_define
+  rpc CreateTaskDefine (CreateRequest) returns (CreateReply) {
+    option (google.api.http) = {
+      post: "/tick-tock/task-define"
+      body: "*"
+    };
+  }
+
+  // Update task_define status
+  rpc UpdateTaskDefineStatus(UpdateRequest) returns(UpdateReply) {
+    option (google.api.http) = {
+      put: "/tick-tock/task-define/{tid}"
+      body: "*"
+    };
+  }
+}
+
+message CreateRequest {
+  string app = 1;
+  string name = 2;
+  string cron_expression = 3;
+  Notify notify_http_params = 4;
+}
+
+message Notify {
+  string http_url = 1;
+  string http_method = 2;
+  map<string, string> http_header_params = 3;
+  string http_body_params = 4;
+}
+
+message CreateReply {
+  int32 code = 1;
+  string message = 2;
+  TaskDefineReplyData data = 3;
+}
+
+message TaskDefineReplyData {
+  string tid = 1;
+}
+
+enum TaskDefineStatus {
+  TASK_DEFINE_STATUS_UNSPECIFIED = 0;
+  TASK_DEFINE_STATUS_ENABLE = 1;
+  TASK_DEFINE_STATUS_DISABLE = 2;
+}
+
+message UpdateRequest {
+  string tid = 1;
+  TaskDefineStatus status = 2;
+}
+
+message UpdateReply {
+  int32 code = 1;
+  string message = 2;
+}
