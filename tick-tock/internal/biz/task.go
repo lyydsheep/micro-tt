@@ -32,6 +32,6 @@ type TaskRepo interface {
 }
 
 type TaskCache interface {
-	Zrange(ctx context.Context, key string, start, stop int64) error
-	SaveTasks(ctx context.Context, tasks []Task) error
+	GetValByStartAndEnd(ctx context.Context, key string, startUnixMilli int64, endUnixMilli int64) ([]*Task, error)
+	SaveTasks(ctx context.Context, tasks []*Task) error
 }

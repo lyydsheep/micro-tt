@@ -2,6 +2,7 @@ package data
 
 import (
 	"context"
+	"github.com/redis/go-redis/v9"
 	"tick-tock/internal/data/gen"
 	"tick-tock/pkg/log"
 
@@ -17,6 +18,7 @@ const contextVal = "transaction"
 // Data .
 type Data struct {
 	query *gen.Query
+	redis *redis.Client
 }
 
 // NewData .
