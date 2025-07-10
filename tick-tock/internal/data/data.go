@@ -22,11 +22,14 @@ type Data struct {
 }
 
 // NewData .
-func NewData(query *gen.Query) (*Data, func(), error) {
+func NewData(query *gen.Query, redis *redis.Client) (*Data, func(), error) {
 	cleanup := func() {
 		log.Info(nil, "closing the data resources.")
 	}
-	return &Data{}, cleanup, nil
+	return &Data{
+		query: query,
+		redis: redis,
+	}, cleanup, nil
 }
 
 func (d *Data) Txn(ctx context.Context, fn func(ctx context.Context) error) error {
