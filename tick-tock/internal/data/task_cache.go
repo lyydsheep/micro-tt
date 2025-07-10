@@ -53,7 +53,7 @@ func (c *taskCache) SaveTasks(ctx context.Context, tasks []*biz.Task) error {
 		for i := range tasks {
 			// 不同索引对应的运行时间不同
 			// tableName 也不同，不能进行聚合写优化
-			tableName := task.GetTableName(ctx, c.confData, *tasks[i])
+			tableName := task.GetTableName(ctx, c.confData, tasks[i].RunTime, tasks[i].ID)
 			pipe.ZAdd(ctx, tableName, redis.Z{
 				Score:  float64(tasks[i].RunTime.UnixMilli()),
 				Member: task.UnionTimerIDAndRunTime(tasks[i].Tid, tasks[i].RunTime.UnixMilli()),

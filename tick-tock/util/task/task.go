@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
-	"tick-tock/internal/biz"
 	"tick-tock/internal/conf"
 	"tick-tock/internal/constant"
+	"time"
 )
 
 func UnionTimerIDAndRunTime(timerID string, runTime int64) string {
@@ -25,13 +25,19 @@ func SplitTimerIDAndRunTime(key string) (timerID string, runTime int64, err erro
 	return
 }
 
-func GetTableName(ctx context.Context, confData *conf.Data, task biz.Task) string {
+func GetTableName(ctx context.Context, confData *conf.Data, runTime time.Time, taskID int64) string {
 	// key 格式：颗粒度是一分钟、“横向”分桶
 	// eg: 2025-07-08 16:36:53_7
 	mod := int64(16)
 	if confData.Scheduler.BucketCount != 0 {
 		mod = int64(confData.Scheduler.BucketCount)
 	}
-	prefix := task.RunTime.Format(constant.BucketPrefixFormat)
-	return fmt.Sprintf("%s_%d", prefix, task.ID%mod)
+	prefix := runTime.Format(constant.BucketPrefixFormat)
+	return fmt.Sprintf("%s_%d", prefix, taskID%mod)
+}
+
+func GetLockKey(ctx context.Context, confData *conf.Data, tableName string) string {
+	// key 锁格式：prefix_tableName
+	// eg: scheduler_2025-07-08 16:36:53_7
+	return fmt.Sprintf("%s_%s", confData.Scheduler.LockPrefix, tableName)
 }
