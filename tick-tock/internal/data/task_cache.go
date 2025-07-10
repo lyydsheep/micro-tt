@@ -7,7 +7,6 @@ import (
 	"github.com/redis/go-redis/v9"
 	"tick-tock/internal/biz"
 	"tick-tock/internal/conf"
-	"tick-tock/internal/constant"
 	"tick-tock/pkg/log"
 	"tick-tock/util/task"
 	"time"
@@ -53,14 +52,14 @@ func (c *taskCache) SaveTasks(ctx context.Context, tasks []*biz.Task) error {
 	if _, err := pipe.Pipelined(ctx, func(pipe redis.Pipeliner) error {
 		for i := range tasks {
 			// 不同索引对应的运行时间不同
-			// key 也不同，不能进行聚合写优化
-			key := c.getKey(ctx, *tasks[i])
-			pipe.ZAdd(ctx, key, redis.Z{
+			// tableName 也不同，不能进行聚合写优化
+			tableName := task.GetTableName(ctx, c.confData, *tasks[i])
+			pipe.ZAdd(ctx, tableName, redis.Z{
 				Score:  float64(tasks[i].RunTime.UnixMilli()),
 				Member: task.UnionTimerIDAndRunTime(tasks[i].Tid, tasks[i].RunTime.UnixMilli()),
 			})
 			// 默认 24小时过期
-			pipe.Expire(ctx, key, time.Hour*24)
+			pipe.Expire(ctx, tableName, time.Hour*24)
 		}
 		if _, err := pipe.Exec(ctx); err != nil {
 			log.Error(ctx, "pipe execute error.", "error", err)
@@ -79,15 +78,4 @@ func NewTaskCache(data *Data) biz.TaskCache {
 	return &taskCache{
 		data: data,
 	}
-}
-
-func (c *taskCache) getKey(ctx context.Context, task biz.Task) string {
-	// key 格式：颗粒度是一分钟、“横向”分桶
-	// eg: 2025-07-08 16:36:53_7
-	mod := int64(16)
-	if c.confData.Scheduler.BucketCount != 0 {
-		mod = int64(c.confData.Scheduler.BucketCount)
-	}
-	prefix := task.RunTime.Format(constant.BucketPrefixFormat)
-	return fmt.Sprintf("%s_%d", prefix, task.ID%mod)
 }
