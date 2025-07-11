@@ -48,13 +48,13 @@ func (uc *SchedulerUsecase) Schedule(ctx context.Context) {
 				if err := uc.pool.Submit(func() {
 					uc.handleBucket(ctx, now.Add(-time.Minute), i)
 				}); err != nil {
-					log.Error(ctx, "submit task error.", "error", err)
+					log.Error(ctx, "submit task error.", "error", err, "bucketID", i, "startTime", now.Add(-time.Minute))
 				}
 				// 处理当前分钟的任务
 				if err := uc.pool.Submit(func() {
 					uc.handleBucket(ctx, now, i)
 				}); err != nil {
-					log.Error(ctx, "submit task error.", "error", err)
+					log.Error(ctx, "submit task error.", "error", err, "bucketID", i, "startTime", now)
 				}
 			}
 		}
@@ -67,15 +67,22 @@ func (uc *SchedulerUsecase) handleBucket(ctx context.Context, now time.Time, buc
 	key := task.GetLockKey(ctx, uc.conf, tableName)
 	res, val, err := uc.lock.Lock(ctx, key, uc.conf.Scheduler.LockDuration.AsDuration())
 	if err != nil {
-		log.Error(ctx, "lock failed.", err)
+		log.Error(ctx, "lock failed.", "error", err, "key", key)
 		return
 	}
 	if !res {
-		log.Info(ctx, "distributed lock has been taken.")
+		log.Info(ctx, "distributed lock has been taken.", "key", key)
 		return
 	}
 	log.Info(ctx, "get distributed lock success.", "val", val)
-	if err = uc.trigger.Work(ctx, tableName, func() {}); err != nil {
-		log.Error(ctx, "trigger work failed.", err)
+	ack := func() {
+		// 任务成功完成，调用此函数
+		// 对分布式锁进行续期
+		if err := uc.lock.RenewLock(ctx, key, val, uc.conf.Scheduler.RenewLockDuration.AsDuration()); err != nil {
+			log.Error(ctx, "renew lock failed.", "error", err, "key", key)
+		}
+	}
+	if err = uc.trigger.Work(ctx, tableName, ack); err != nil {
+		log.Error(ctx, "trigger work failed.", "error", err, "tableName", tableName)
 	}
 }
