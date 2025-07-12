@@ -22,10 +22,11 @@ func (repo *taskRepo) Update(ctx context.Context, task *biz.Task) (*biz.Task, er
 	return task, err
 }
 
-func (repo *taskRepo) GetTaskByIDAndRunTime(ctx context.Context, id int64, runTime time.Time) (*biz.Task, error) {
+func (repo *taskRepo) GetTaskByRunTime(ctx context.Context, startTime time.Time, endTime time.Time) ([]*biz.Task, error) {
 	q := repo.data.query.Task
-	task, err := q.WithContext(ctx).Where(q.ID.Eq(id)).Where(q.RunTime.Eq(runTime)).First()
-	return task, err
+	tasks, err := q.WithContext(ctx).Where(q.RunTime.Gte(startTime),
+		q.RunTime.Lt(endTime)).Find()
+	return tasks, err
 }
 
 func NewTaskRepo(data *Data) biz.TaskRepo {

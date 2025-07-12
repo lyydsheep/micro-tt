@@ -28,7 +28,7 @@ func (*Task) TableName() string {
 type TaskRepo interface {
 	Create(ctx context.Context, task *Task) (*Task, error)
 	Update(ctx context.Context, task *Task) (*Task, error)
-	GetTaskByIDAndRunTime(ctx context.Context, id int64, runTime time.Time) (*Task, error)
+	GetTaskByRunTime(ctx context.Context, startTime time.Time, endTime time.Time) ([]*Task, error)
 }
 
 type TaskCache interface {

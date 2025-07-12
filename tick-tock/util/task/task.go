@@ -7,6 +7,7 @@ import (
 	"strings"
 	"tick-tock/internal/conf"
 	"tick-tock/internal/constant"
+	"tick-tock/pkg/log"
 	"time"
 )
 
@@ -40,4 +41,32 @@ func GetLockKey(ctx context.Context, confData *conf.Data, tableName string) stri
 	// key 锁格式：prefix_tableName
 	// eg: scheduler_2025-07-08 16:36:53_7
 	return fmt.Sprintf("%s_%s", confData.Scheduler.LockPrefix, tableName)
+}
+
+func GetRuntimeMinute(ctx context.Context, tableName string) (time.Time, error) {
+	strs := strings.Split(tableName, "_")
+	if len(strs) != 2 {
+		log.Error(ctx, "invalid tableName: %s", tableName)
+		return time.Time{}, fmt.Errorf("invalid tableName: %s", tableName)
+	}
+	startTime, err := time.Parse(constant.BucketPrefixFormat, strs[0])
+	if err != nil {
+		log.Error(ctx, "parse time error.", "error", err, "tableName", tableName)
+		return time.Time{}, err
+	}
+	return startTime, nil
+}
+
+func GetBucketID(ctx context.Context, tableName string) (int, error) {
+	strs := strings.Split(tableName, "_")
+	if len(strs) != 2 {
+		log.Error(ctx, "invalid tableName: %s", tableName)
+		return 0, fmt.Errorf("invalid tableName: %s", tableName)
+	}
+	res, err := strconv.Atoi(strs[1])
+	if err != nil {
+		log.Error(ctx, "parse bucketID error.", "error", err, "tableName", tableName)
+		return 0, err
+	}
+	return res, nil
 }
