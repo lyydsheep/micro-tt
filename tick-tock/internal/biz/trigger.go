@@ -89,6 +89,7 @@ func (uc *TriggerUsecase) handleSlice(ctx context.Context, tableName string, sta
 	for i := range tasks {
 		if tasks[i].ID%int64(uc.conf.Scheduler.BucketCount) == int64(bucketId) {
 			// pool 过载或者已关闭则会报错
+			// 如果任务在执行过程中失败了，无法得到重试，这是一个 bug
 			if err = uc.pool.Submit(func() {
 				uc.executor.Work(ctx, tasks[i])
 			}); err != nil {

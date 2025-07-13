@@ -10,6 +10,12 @@ type taskRepo struct {
 	data *Data
 }
 
+func (repo *taskRepo) UpdateByTIDAndRuntime(ctx context.Context, tid string, runTime time.Time, updates map[string]any) error {
+	q := repo.data.DB(ctx).Task
+	_, err := q.WithContext(ctx).Where(q.Tid.Eq(tid), q.RunTime.Eq(runTime)).Updates(updates)
+	return err
+}
+
 func (repo *taskRepo) Create(ctx context.Context, task *biz.Task) (*biz.Task, error) {
 	q := repo.data.DB(ctx).Task
 	err := q.WithContext(ctx).Create(task)

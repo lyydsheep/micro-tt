@@ -29,6 +29,7 @@ type TaskRepo interface {
 	Create(ctx context.Context, task *Task) (*Task, error)
 	Update(ctx context.Context, task *Task) (*Task, error)
 	GetTaskByRunTime(ctx context.Context, startTime time.Time, endTime time.Time, status int32) ([]*Task, error)
+	UpdateByTIDAndRuntime(ctx context.Context, tid string, runTime time.Time, updates map[string]any) error
 }
 
 type TaskCache interface {

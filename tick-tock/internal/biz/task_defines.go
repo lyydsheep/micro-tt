@@ -22,6 +22,14 @@ type TaskDefine struct {
 	UpdateTime      time.Time `gorm:"column:update_time;type:timestamp;not null;default:CURRENT_TIMESTAMP" json:"update_time"`
 }
 
+type NotifyHTTPParam struct {
+	URL     string            `json:"url"`
+	Method  string            `json:"method"`
+	Headers map[string]string `json:"headers"`
+	Params  map[string]string `json:"params"`
+	Body    string            `json:"body"`
+}
+
 // TableName TaskDefine's table name
 func (*TaskDefine) TableName() string {
 	return TableNameTaskDefine
@@ -30,6 +38,6 @@ func (*TaskDefine) TableName() string {
 type TaskDefineRepo interface {
 	Create(ctx context.Context, taskDefine *TaskDefine) (*TaskDefine, error)
 	Update(ctx context.Context, taskDefine *TaskDefine) (*TaskDefine, error)
-	GetTaskDefineByID(ctx context.Context, id int64) (*TaskDefine, error)
+	GetTaskDefineByTID(ctx context.Context, tID string) (*TaskDefine, error)
 	GetTaskDefineByStatus(ctx context.Context, status constant.TaskDefineStatus) ([]*TaskDefine, error)
 }

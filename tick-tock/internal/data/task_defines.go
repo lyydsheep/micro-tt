@@ -27,9 +27,9 @@ func (repo *taskDefineRepo) Update(ctx context.Context, taskDefine *biz.TaskDefi
 	return taskDefine, err
 }
 
-func (repo *taskDefineRepo) GetTaskDefineByID(ctx context.Context, id int64) (*biz.TaskDefine, error) {
+func (repo *taskDefineRepo) GetTaskDefineByTID(ctx context.Context, tID string) (*biz.TaskDefine, error) {
 	q := repo.data.query.TaskDefine
-	return q.WithContext(ctx).Where(q.ID.Eq(id)).First()
+	return q.WithContext(ctx).Where(q.Tid.Eq(tID)).First()
 }
 
 func NewTaskDefineRepo(data *Data) biz.TaskDefineRepo {
