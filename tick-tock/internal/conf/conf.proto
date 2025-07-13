@@ -57,6 +57,7 @@ message Data {
   Redis redis = 2;
   Scheduler scheduler = 3;
   Migrator migrator = 4;
+  Trigger trigger = 5;
 }
 
 message Scheduler {
@@ -76,4 +77,10 @@ message Scheduler {
 
 message Migrator {
   google.protobuf.Duration migrate_step = 1;
+}
+
+message Trigger {
+  google.protobuf.Duration poll_interval = 1;
+  google.protobuf.Duration range_gap = 2;
+  int32 worker_pool_size = 3;
 }
