@@ -32,6 +32,7 @@ func newDynamicHandler(errWriter, appWriter slog.Handler, level slog.Level) *Dyn
 	return h
 }
 
+// 设置日志级别
 func (h *DynamicHandler) Enabled(ctx context.Context, level slog.Level) bool {
 	return h.level.Level() >= level
 }
@@ -57,6 +58,7 @@ func (h *DynamicHandler) SetLevel(level slog.Level) {
 	h.level.Set(level)
 }
 
+// 开发模式
 func devHandler() slog.Handler {
 	appWriter := os.Stdout
 	return tint.NewHandler(appWriter, &tint.Options{
@@ -65,6 +67,7 @@ func devHandler() slog.Handler {
 	})
 }
 
+// 生产模式
 func prodHandler() slog.Handler {
 	// TODO 修改成配置
 	// 多个输出
@@ -94,6 +97,7 @@ func prodHandler() slog.Handler {
 	)
 }
 
+// 追加个性化参数，例如 trace_id
 func addParams(ctx context.Context, args ...any) []any {
 	// 添加 trace_id
 	if ctx == nil {
@@ -107,6 +111,7 @@ func addParams(ctx context.Context, args ...any) []any {
 	return args
 }
 
+// 获取调用者信息，输出文件名和行号
 func caller(skip int) string {
 	pc, file, line, _ := runtime.Caller(skip)
 	fn := runtime.FuncForPC(pc)
