@@ -2,10 +2,9 @@ package main
 
 import (
 	"github.com/go-kratos/kratos/v2"
-	"github.com/go-kratos/kratos/v2/transport/grpc"
-	"github.com/go-kratos/kratos/v2/transport/http"
 	"os"
 	"tick-tock/configs"
+	"tick-tock/internal/daemon"
 	"tick-tock/pkg/log"
 )
 
@@ -21,15 +20,14 @@ var (
 	id, _ = os.Hostname()
 )
 
-func newApp(gs *grpc.Server, hs *http.Server) *kratos.App {
+func newApp(ds *daemon.Server) *kratos.App {
 	return kratos.New(
 		kratos.ID(id),
 		kratos.Name(Name),
 		kratos.Version(Version),
 		kratos.Metadata(map[string]string{}),
 		kratos.Server(
-			gs,
-			hs,
+			ds,
 		),
 	)
 }
