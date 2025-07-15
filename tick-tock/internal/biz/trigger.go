@@ -13,9 +13,8 @@ import (
 
 type TriggerUsecase struct {
 	conf     *conf.Data
-	pool     ants.Pool
+	pool     *ants.Pool
 	cache    TaskCache
-	poll     *ants.Pool
 	taskRepo TaskRepo
 	executor *ExecutorUsecase
 }
@@ -120,13 +119,16 @@ func (uc *TriggerUsecase) getTasks(ctx context.Context, tableName string, startU
 	return tasks, nil
 }
 
-func NewTriggerUsecase(conf *conf.Data, pool ants.Pool, cache TaskCache, poll *ants.Pool, taskRepo TaskRepo, executor *ExecutorUsecase) *TriggerUsecase {
+func NewTriggerUsecase(conf *conf.Data, cache TaskCache, taskRepo TaskRepo, executor *ExecutorUsecase) *TriggerUsecase {
+	pool, err := ants.NewPool(int(conf.Trigger.WorkerPoolSize), ants.WithNonblocking(true))
+	if err != nil {
+		log.Fatal(nil, "new ants pool failed.", "error", err)
+	}
 	return &TriggerUsecase{
 		conf:     conf,
-		pool:     pool,
 		cache:    cache,
-		poll:     poll,
 		taskRepo: taskRepo,
+		pool:     pool,
 		executor: executor,
 	}
 }

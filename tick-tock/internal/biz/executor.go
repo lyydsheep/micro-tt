@@ -15,6 +15,14 @@ type ExecutorUsecase struct {
 	taskRepo       TaskRepo
 }
 
+func NewExecutorUsecase(conf *conf.Data, taskDefineRepo TaskDefineRepo, taskRepo TaskRepo) *ExecutorUsecase {
+	return &ExecutorUsecase{
+		conf:           conf,
+		taskDefineRepo: taskDefineRepo,
+		taskRepo:       taskRepo,
+	}
+}
+
 func (uc *ExecutorUsecase) Work(ctx context.Context, task *Task) {
 	// 查询 task_define，获取具体执行的动作
 	taskDefine, err := uc.taskDefineRepo.GetTaskDefineByTID(ctx, task.Tid)

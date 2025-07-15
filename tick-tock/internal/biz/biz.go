@@ -7,7 +7,7 @@ import (
 
 // ProviderSet is biz providers.
 // 注入 useCase
-var ProviderSet = wire.NewSet(NewMigrator)
+var ProviderSet = wire.NewSet(NewMigrator, NewSchedulerUsecase, NewTriggerUsecase, NewExecutorUsecase)
 
 type Transaction interface {
 	Txn(ctx context.Context, fn func(ctx context.Context) error) error
