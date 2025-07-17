@@ -74,8 +74,9 @@ func (c *taskCache) SaveTasks(ctx context.Context, tasks []*biz.Task) error {
 	return nil
 }
 
-func NewTaskCache(data *Data) biz.TaskCache {
+func NewTaskCache(data *Data, conf *conf.Data) biz.TaskCache {
 	return &taskCache{
-		data: data,
+		data:     data,
+		confData: conf,
 	}
 }

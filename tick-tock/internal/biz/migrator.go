@@ -18,12 +18,13 @@ type MigratorUseCase struct {
 	taskCache      TaskCache
 }
 
-func NewMigrator(data *conf.Data, taskDefineRepo TaskDefineRepo, taskRepo TaskRepo, tm Transaction) *MigratorUseCase {
+func NewMigrator(data *conf.Data, taskDefineRepo TaskDefineRepo, taskRepo TaskRepo, tm Transaction, taskCache TaskCache) *MigratorUseCase {
 	return &MigratorUseCase{
 		data:           data,
 		taskDefineRepo: taskDefineRepo,
 		taskRepo:       taskRepo,
 		txnManager:     tm,
+		taskCache:      taskCache,
 	}
 }
 

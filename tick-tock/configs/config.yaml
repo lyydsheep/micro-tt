@@ -9,7 +9,7 @@ server:
     tasks:
       - name: migrator
         type: cron
-        schedule: "@every 1m"
+        schedule: "@every 30m"
       - name: scheduler
         type: once
 #        首次触发的延迟时间
@@ -36,7 +36,7 @@ data:
     worker_poll_size: 100
     bucket_count: 1
   migrator:
-    migrate_step: 1s
+    migrate_step: 1800s
   trigger:
     poll_interval: 1s
     range_gap: 1s
