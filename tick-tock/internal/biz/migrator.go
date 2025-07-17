@@ -36,6 +36,7 @@ func (m *MigratorUseCase) Start(ctx context.Context) {
 		log.Error(ctx, "get task define error.", "error", err)
 		return
 	}
+	log.Info(ctx, "get task define success.", "task_define_count", len(taskDefines))
 	var eg errgroup.Group
 	for _, taskDefine := range taskDefines {
 		eg.Go(func() error {
@@ -61,8 +62,10 @@ func (m *MigratorUseCase) migrator(ctx context.Context, taskDefine *TaskDefine, 
 	// 如果开始时间早于当前时间，则从当前时间开始
 	// 避免出现[start, now]之间的任务
 	if start.Before(now) {
-		log.Info(ctx, "start time is before now.", "task_define_id", taskDefine.ID)
 		start = now
+		// 一次性生成两个步长时间的任务
+		step <<= 1
+		log.Info(ctx, "start time is before now, generate two steps in one time.", "task_define_id", taskDefine.ID)
 	}
 	end := start.Add(step)
 	// 生成[start, end)时间范围内的任务
@@ -80,6 +83,7 @@ func (m *MigratorUseCase) migrator(ctx context.Context, taskDefine *TaskDefine, 
 		return m.saveTasksAndUpdateTaskDefine(ctx, taskDefine, tasks)
 	}); err != nil {
 		log.Error(ctx, "save tasks and update task define error.", "error", err, "task_define_id", taskDefine.ID)
+		return err
 	}
 
 	// 将定时任务插入 Redis
