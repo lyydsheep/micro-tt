@@ -12,11 +12,19 @@ server:
         schedule: "@every 1m"
       - name: scheduler
         type: once
+#        首次触发的延迟时间
         schedule: "0s"
 data:
   database:
     driver: mysql
-    source: root:root@tcp(127.0.0.1:33019)/test?parseTime=True&loc=Local
+    addr: 127.0.0.1:33060
+    username: root
+    password: root
+    database: micro_tt
+    max_open_conn: 10
+    max_idle_conn: 10
+#    proto duration 写法
+    conn_max_idle_time: 60s
   redis:
     addr: 127.0.0.1:34701
     read_timeout: 0.2s
@@ -26,4 +34,10 @@ data:
     lock_duration: 70s
     lock_prefix: scheduler_lock_
     worker_poll_size: 100
-    bucket_count: 10
+    bucket_count: 1
+  migrator:
+    migrate_step: 1s
+  trigger:
+    poll_interval: 1s
+    range_gap: 1s
+    worker_pool_size: 100

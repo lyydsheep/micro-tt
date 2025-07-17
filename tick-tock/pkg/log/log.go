@@ -114,6 +114,9 @@ func addParams(ctx context.Context, args ...any) []any {
 // 获取调用者信息，输出文件名和行号
 func caller(skip int) string {
 	pc, file, line, _ := runtime.Caller(skip)
+	if filepath.Base(file) == "log_db.go" {
+		pc, file, line, _ = runtime.Caller(skip + 6)
+	}
 	fn := runtime.FuncForPC(pc)
 	return fmt.Sprintf("%s %s:%d", fn.Name(), filepath.Base(file), line)
 }
