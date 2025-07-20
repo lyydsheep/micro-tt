@@ -64,12 +64,12 @@ func (uc *TriggerUsecase) Work(ctx context.Context, tableName string, ack func()
 
 	// 执行回调函数
 	ack()
-
+	log.Info(ctx, "trigger work done.", "tableName", tableName)
 	return nil
 }
 
 func (uc *TriggerUsecase) handleSlice(ctx context.Context, tableName string, startUnixMilli int64, endUnixMilli int64) error {
-	start, end := time.UnixMilli(startUnixMilli), time.UnixMilli(endUnixMilli)
+	start, end := time.UnixMilli(startUnixMilli).UTC(), time.UnixMilli(endUnixMilli).UTC()
 	log.Info(ctx, "handle slice.", "tableName", tableName, "start", start, "end", end)
 
 	tasks, err := uc.getTasks(ctx, tableName, startUnixMilli, endUnixMilli)
