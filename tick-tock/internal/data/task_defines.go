@@ -4,6 +4,7 @@ import (
 	"context"
 	"tick-tock/internal/biz"
 	"tick-tock/internal/constant"
+	"time"
 )
 
 type taskDefineRepo struct {
@@ -23,7 +24,10 @@ func (repo *taskDefineRepo) Create(ctx context.Context, taskDefine *biz.TaskDefi
 
 func (repo *taskDefineRepo) Update(ctx context.Context, taskDefine *biz.TaskDefine) (*biz.TaskDefine, error) {
 	q := repo.data.DB(ctx).TaskDefine
-	err := q.WithContext(ctx).Save(taskDefine)
+	_, err := q.WithContext(ctx).Where(q.ID.Eq(taskDefine.ID)).Updates(map[string]any{
+		"last_migrate_time": taskDefine.LastMigrateTime,
+		"update_time":       time.Now().UTC(),
+	})
 	return taskDefine, err
 }
 
