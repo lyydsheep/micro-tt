@@ -39,6 +39,7 @@ func (uc *TriggerUsecase) Work(ctx context.Context, tableName string, ack func()
 	}
 
 	// 轮询
+Loop:
 	for range ticker.C {
 		select {
 		case <-ctx.Done():
@@ -52,7 +53,7 @@ func (uc *TriggerUsecase) Work(ctx context.Context, tableName string, ack func()
 			// 超过一分钟
 			if startTime = startTime.Add(rangeGap); !startTime.Before(endTime) {
 				log.Info(ctx, "trigger had gone all slices.", "tableName", tableName)
-				break
+				break Loop
 			}
 		}
 	}
