@@ -23,17 +23,20 @@ func SplitTimerIDAndRunTime(key string) (timerID string, runTime int64, err erro
 	if runTime, err = strconv.ParseInt(strs[1], 10, 64); err != nil {
 		return "", 0, fmt.Errorf("invalid runTime: %s", strs[1])
 	}
+	timerID = strs[0]
 	return
 }
 
 func GetTableName(ctx context.Context, confData *conf.Data, runTime time.Time, taskID int64) string {
 	// key 格式：颗粒度是一分钟、“横向”分桶
-	// eg: 2025-07-08 16:36:53_7
+	// eg: 2025-07-08 16:36:00_7
 	mod := int64(16)
 	if confData.Scheduler.BucketCount != 0 {
 		mod = int64(confData.Scheduler.BucketCount)
 	}
 	prefix := runTime.Format(constant.BucketPrefixFormat)
+	length := len(prefix)
+	prefix = prefix[:length-2] + "00"
 	return fmt.Sprintf("%s_%d", prefix, taskID%mod)
 }
 
@@ -54,7 +57,7 @@ func GetRuntimeMinute(ctx context.Context, tableName string) (time.Time, error) 
 		log.Error(ctx, "parse time error.", "error", err, "tableName", tableName)
 		return time.Time{}, err
 	}
-	return startTime, nil
+	return startTime.UTC(), nil
 }
 
 func GetBucketID(ctx context.Context, tableName string) (int, error) {
