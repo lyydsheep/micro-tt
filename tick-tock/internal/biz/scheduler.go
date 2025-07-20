@@ -74,13 +74,15 @@ func (uc *SchedulerUsecase) handleBucket(ctx context.Context, now time.Time, buc
 		log.Info(ctx, "distributed lock has been taken.", "key", key)
 		return
 	}
-	log.Info(ctx, "get distributed lock success.", "val", val)
+	log.Info(ctx, "get distributed lock success.", "key", key, "val", val)
 	ack := func() {
 		// 任务成功完成，调用此函数
 		// 对分布式锁进行续期
 		if err := uc.lock.RenewLock(ctx, key, val, uc.conf.Scheduler.RenewLockDuration.AsDuration()); err != nil {
 			log.Error(ctx, "renew lock failed.", "error", err, "key", key)
+			return
 		}
+		log.Info(ctx, "renew lock success.", "key", key)
 	}
 	if err = uc.trigger.Work(ctx, tableName, ack); err != nil {
 		log.Error(ctx, "trigger work failed.", "error", err, "tableName", tableName)

@@ -40,7 +40,9 @@ func (uc *ExecutorUsecase) Work(ctx context.Context, task *Task) {
 	}
 
 	// 保存结果并设置任务状态
-	uc.success(ctx, task.Tid, task.RunTime, costTime, outPut)
+	if err = uc.success(ctx, task.Tid, task.RunTime, costTime, outPut); err == nil {
+		log.Info(ctx, "execute task success.", "tID", task.Tid, "runTime", task.RunTime, "costTime", costTime, "outPut", outPut)
+	}
 }
 
 func (uc *ExecutorUsecase) execute(ctx context.Context, taskDefine *TaskDefine) (costTime int64, outPut string, err error) {
@@ -67,16 +69,20 @@ func (uc *ExecutorUsecase) execute(ctx context.Context, taskDefine *TaskDefine) 
 	return time.Now().Sub(startTime).Milliseconds(), string(bytes), nil
 }
 
-func (uc *ExecutorUsecase) fail(ctx context.Context, tID string, runTime time.Time) {
+func (uc *ExecutorUsecase) fail(ctx context.Context, tID string, runTime time.Time) error {
 	if err := uc.taskRepo.UpdateByTIDAndRuntime(ctx, tID, runTime, map[string]any{"status": constant.TaskFail.ToInt32(), "update_time": time.Now().UTC()}); err != nil {
 		log.Error(ctx, "update task status error.", "error", err, "tID", tID, "runTime", runTime)
+		return err
 	}
+	return nil
 }
 
-func (uc *ExecutorUsecase) success(ctx context.Context, tID string, runTime time.Time, costTime int64, outPut string) {
+func (uc *ExecutorUsecase) success(ctx context.Context, tID string, runTime time.Time, costTime int64, outPut string) error {
 	// 更新任务状态
 	if err := uc.taskRepo.UpdateByTIDAndRuntime(ctx, tID, runTime, map[string]any{"status": constant.TaskSuccess.ToInt32(),
 		"cost_time": costTime, "output": outPut, "update_time": time.Now().UTC()}); err != nil {
 		log.Error(ctx, "update task status error.", "error", err, "tID", tID, "runTime", runTime)
+		return err
 	}
+	return nil
 }
